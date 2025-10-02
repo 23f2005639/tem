@@ -27,8 +27,7 @@ jobs:
           key: cache-c572639
 
       # This step checks the output of the previous 'cache-step' to see if a cache was found.
-      - name: Prime cache and echo result
-        id: prime-cache-c572639
+      - name: prime-cache-c572639
         run: |
           if [[ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]]; then
             echo "✅ Cache hit for key: ${{ steps.cache-step.outputs.cache-primary-key }}"
