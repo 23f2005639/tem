@@ -1,21 +1,43 @@
-name: Super-Linter
+# .github/workflows/main.yml
 
-on: push
+name: CI with Dependency Caching
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
 
 jobs:
-  super-lint:
-    name: Lint code base
+  build-and-cache:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Run Super-Linter
-        uses: github/super-linter@v7
-        
-      - name: 23f2005639@ds.study.iitm.ac.in
-        run: echo "Hello, world!"
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # This step attempts to restore a cache with the specific key.
+      # On the first run, it will be a "miss". On subsequent runs, it should be a "hit".
+      - name: Cache dependencies
+        id: cache-step # Add an ID to reference the output of this step
+        uses: actions/cache@v4
+        with:
+          # Path to the directory you want to cache (e.g., ~/.npm for npm, ~/.gradle for Gradle)
+          path: ~/.npm
+          # The exact key for priming the cache
+          key: cache-c572639
+
+      # This step checks the output of the previous 'cache-step' to see if a cache was found.
+      - name: Prime cache and echo result
+        id: prime-cache-c572639
+        run: |
+          if [[ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]]; then
+            echo "✅ Cache hit for key: ${{ steps.cache-step.outputs.cache-primary-key }}"
+          else
+            echo "❌ Cache miss. A new cache will be created."
+          fi
+
+      # Example step using the cache.
+      # This step will run faster on subsequent builds if the cache was restored.
+      # This assumes you have a package.json file in your repository.
+      - name: Install Node.js dependencies
+        run: npm install
